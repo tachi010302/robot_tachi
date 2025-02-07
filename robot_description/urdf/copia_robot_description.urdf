@@ -1,0 +1,218 @@
+<robot name="robot_tachi">
+    <!-- Base cilíndrica inferior -->
+    <link name="base_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>  <!-- Mantiene el cilindro centrado en el TF base_link -->
+            <geometry>
+                <cylinder radius="0.30" length="0.019"/> 
+            </geometry>
+            <material name="blue">
+                <color rgba="0 0.5 1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Soporte tubular entre la base y la tapa -->
+    <link name="support_tube">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.125"/>  <!-- El soporte tubular de 25 cm de altura -->
+            <geometry>
+                <cylinder radius="0.02" length="0.25"/>  <!-- Radio de 2 cm y altura de 25 cm -->
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Tapa cilíndrica superior -->
+    <link name="top_base_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.25"/>  <!-- La tapa se coloca a 25 cm de altura -->
+            <geometry>
+                <cylinder radius="0.30" length="0.019"/>
+            </geometry>
+            <material name="blue">
+                <color rgba="0 0.5 1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joint entre base y soporte tubular -->
+    <joint name="base_to_support_tube" type="fixed">
+        <parent link="base_link"/>
+        <child link="support_tube"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Conexión fija entre la base y el soporte -->
+    </joint>
+
+    <!-- Joint entre soporte tubular y tapa superior -->
+    <joint name="support_tube_to_top_base" type="fixed">
+        <parent link="support_tube"/>
+        <child link="top_base_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Conexión fija entre el soporte y la tapa superior -->
+    </joint>
+
+    <!-- Rueda derecha -->
+    <link name="right_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="1.5708 0 0" /> 
+            <geometry>
+                <cylinder length="0.05" radius="0.10" />
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="1.5708 0 0" />
+            <geometry>
+                <cylinder length="0.05" radius="0.1" />
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Rueda izquierda -->
+    <link name="left_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="1.5708 0 0" />
+            <geometry>
+                <cylinder length="0.05" radius="0.1" />
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="1.5708 0 0" />
+            <geometry>
+                <cylinder length="0.05" radius="0.10" />
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- Joint entre base y rueda derecha -->
+    <joint name="base_to_right_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_wheel"/>
+        <origin xyz="0 -0.30 0" rpy="0 0 0"/> <!-- Posición ajustada en el borde de la base -->
+        <axis xyz="0 1 0"/> <!-- Eje de rotación de la rueda -->
+    </joint>
+
+    <!-- Joint entre base y rueda izquierda -->
+    <joint name="base_to_left_wheel" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_wheel"/>
+        <origin xyz="0 0.30 0" rpy="0 0 0"/> <!-- Posición ajustada en el borde de la base -->
+        <axis xyz="0 1 0"/> <!-- Eje de rotación de la rueda -->
+    </joint>
+
+    <!-- Sensor Kinect -->
+    <link name="kinect_sensor">
+        <visual>
+            <origin xyz="0.0 0 0.019" rpy="0 0 0"/> <!-- Montado a 20 cm en el eje X de la base -->
+            <geometry>
+                <box size="0.05 0.25 0.1"/> <!-- Representación simplificada del Kinect -->
+            </geometry>
+            <material name="black">
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joint entre base y sensor Kinect -->
+    <joint name="base_to_kinect" type="fixed">
+        <parent link="base_link"/>
+        <child link="kinect_sensor"/>
+        <origin xyz="0.20 0 0.019" rpy="0 0 0"/> <!-- Posición del Kinect respecto a la base -->
+    </joint>
+
+    <!-- Actuador lineal -->
+    <!-- Tubo fijo del actuador lineal -->
+    <link name="actuator_base">
+        <visual>
+            <origin xyz="0 0 0.25" rpy="0 0 0"/> <!-- Posición del tubo sobre la base superior -->
+            <geometry>
+                <cylinder radius="0.05" length="0.50"/> <!-- Tubo fijo de 50 cm -->
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Parte móvil del actuador lineal -->
+    <link name="actuator_movable">
+        <visual>
+            <origin xyz="0 0 0.75" rpy="0 0 0"/> <!-- Parte inicial en la posición retraída -->
+            <geometry>
+                <cylinder radius="0.04" length="0.60"/> <!-- Parte móvil del actuador de 60 cm -->
+            </geometry>
+            <material name="silver">
+                <color rgba="0.75 0.75 0.75 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joint entre el tubo fijo y la parte móvil del actuador -->
+    <joint name="actuator_joint" type="prismatic">
+        <parent link="actuator_base"/>
+        <child link="actuator_movable"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Posición del actuador con respecto al torso -->
+        <axis xyz="0 0 1"/> <!-- Movimiento a lo largo del eje Z -->
+        <limit lower="0.0" upper="0.60" effort="100.0" velocity="0.1"/> <!-- Límites de movimiento: de 0 a 60 cm -->
+    </joint>
+
+    <!-- Parte superior del torso (conectada al actuador) -->
+    <link name="torso_top">
+        <visual>
+            <origin xyz="0 0 1.05" rpy="0 0 0"/> <!-- Posicionada en la parte superior del actuador -->
+            <geometry>
+                <box size="0.3 0.3 0.05"/> <!-- Caja que representa el torso superior -->
+            </geometry>
+            <material name="blue">
+                <color rgba="0 0.5 1 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joint entre la parte móvil del actuador y la parte superior del torso -->
+    <joint name="movable_to_torso" type="fixed">
+        <parent link="actuator_movable"/>
+        <child link="torso_top"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Posición fija al final de la parte móvil -->
+    </joint>
+
+    <!-- NUEVO Joint entre la tapa superior y el actuador lineal -->
+    <joint name="top_to_actuator_base" type="fixed">
+        <parent link="top_base_link"/>
+        <child link="actuator_base"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Conexión fija entre la tapa superior y el actuador -->
+    </joint>
+
+    <!-- Tubo horizontal (hombro) -->
+    <link name="shoulder_tube">
+        <visual>
+            <origin xyz="0 0 1.02" rpy="1.5708 0 0"/> <!-- Posicionamiento del tubo horizontal (hombro) a 1.02m -->
+            <geometry>
+                <cylinder radius="0.02" length="0.60"/> <!-- Tubo de 60 cm de largo y 2 cm de radio -->
+            </geometry>
+            <material name="gray">
+                <color rgba="0.5 0.5 0.5 1"/>
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joint entre el torso superior y el hombro -->
+    <joint name="torso_to_shoulder" type="fixed">
+        <parent link="torso_top"/>
+        <child link="shoulder_tube"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Conexión fija entre el torso superior y el hombro -->
+    </joint>
+
+
+
+
+
+
+
+</robot>
